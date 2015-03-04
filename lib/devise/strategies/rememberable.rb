@@ -24,6 +24,8 @@ module Devise
           return pass
         end
 
+        set_scope(resource)
+
         if validate(resource)
           remember_me(resource)
           extend_remember_me_period(resource)
