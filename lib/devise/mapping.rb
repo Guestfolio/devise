@@ -42,8 +42,14 @@ module Devise
       raise "Could not find a valid mapping for #{obj.inspect}"
     end
 
-    def self.find_by_path!(path, path_type=:fullpath)
-      Devise.mappings.each_value { |m| return m if path.include?(m.send(path_type)) }
+    def find_by_path!(fullpath, path_type=:fullpath)
+      path = fullpath.sub!(/^\//,"") unless fullpath == "/"
+      Devise.mappings.each_value do |m|
+        mapping_path = m.send(path_type)
+        mapping_path.sub!(/^\//,"") unless mapping_path == "/"
+        return m if path.start_with?(mapping_path)
+      end
+
       raise "Could not find a valid mapping for path #{path.inspect}"
     end
 
