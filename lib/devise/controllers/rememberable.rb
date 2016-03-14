@@ -12,7 +12,7 @@ module Devise
       class Proxy #:nodoc:
         include Devise::Controllers::Rememberable
 
-        delegate :cookies, :env, :to => :@warden
+        delegate :cookies, :env, :request, :to => :@warden
 
         def initialize(warden)
           @warden = warden
@@ -22,14 +22,12 @@ module Devise
       # Remembers the given resource by setting up a cookie
       def remember_me(resource)
         return if env["devise.skip_storage"]
-        scope = Devise::Mapping.find_scope!(resource)
         resource.remember_me!(resource.extend_remember_period)
         cookies.signed[remember_key(resource, scope)] = remember_cookie_values(resource)
       end
 
       # Forgets the given resource by deleting a cookie
       def forget_me(resource)
-        scope = Devise::Mapping.find_scope!(resource)
         resource.forget_me!
         cookies.delete(remember_key(resource, scope), forget_cookie_values(resource))
       end
@@ -51,6 +49,12 @@ module Devise
 
       def remember_key(resource, scope)
         resource.rememberable_options.fetch(:key, "remember_#{scope}_token")
+      end
+
+      private
+
+      def scope
+        Devise::Mapping.find_by_path!(request.fullpath).name
       end
     end
   end

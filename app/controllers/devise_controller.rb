@@ -12,6 +12,10 @@ class DeviseController < Devise.parent_controller.constantize
   prepend_before_filter :assert_is_devise_resource!
   respond_to :html if mimes_for_respond_to.empty?
 
+  def scope
+    Devise::Mapping.find_by_path!(request.fullpath).name
+  end
+
   # Gets the actual resource stored in the instance variable
   def resource
     instance_variable_get(:"@#{resource_name}")
