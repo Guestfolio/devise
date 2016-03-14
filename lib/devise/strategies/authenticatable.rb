@@ -45,6 +45,12 @@ module Devise
         end
       end
 
+      def set_scope(resource)
+        if resource.respond_to?(:"devise_scope=")
+          resource.devise_scope = scope
+        end
+      end
+
       # Get values from params and set in the resource.
       def remember_me(resource)
         resource.remember_me = remember_me? if resource.respond_to?(:remember_me=)
